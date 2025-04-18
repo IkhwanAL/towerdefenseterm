@@ -38,7 +38,7 @@ func generateTowerPlaceholder(
 		screen.SetContent(locationToPlace[1]+1, locationToPlace[0]-1, ' ', nil, tcell.StyleDefault)
 
 		screen.SetContent(locationToPlace[1]-1, locationToPlace[0], ' ', nil, tcell.StyleDefault)
-		screen.SetContent(locationToPlace[1], locationToPlace[0], '*', nil, tcell.StyleDefault)
+		screen.SetContent(locationToPlace[1], locationToPlace[0], ' ', nil, tcell.StyleDefault)
 		screen.SetContent(locationToPlace[1]+1, locationToPlace[0], ' ', nil, tcell.StyleDefault)
 
 		screen.SetContent(locationToPlace[1]-1, locationToPlace[0]+1, ' ', nil, tcell.StyleDefault)
@@ -57,19 +57,30 @@ func interrupt(screen tcell.Screen, notify chan os.Signal) {
 	}()
 }
 func main() {
+	logFile, err := os.OpenFile("debug.log", os.O_RDWR|os.O_APPEND|os.O_CREATE, 0666)
+
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	defer logFile.Close()
+
+	log.SetFlags(log.Default().Flags())
+	log.SetOutput(logFile)
+
 	screen, err := tcell.NewScreen()
 
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	if err = screen.Init(); err != nil {
-		log.Fatal(err.Error())
-	}
-
 	var notifyChan chan os.Signal = make(chan os.Signal, 1)
 
 	interrupt(screen, notifyChan)
+
+	if err = screen.Init(); err != nil {
+		log.Fatal(err.Error())
+	}
 
 	screen.Clear()
 
@@ -90,6 +101,8 @@ func main() {
 
 	generateTowerPlaceholder(towerLocation, screen)
 
+	tick := 1000
+
 	enemies := GenerateEnemy()
 
 	for _, enemy := range enemies {
@@ -97,32 +110,45 @@ func main() {
 	}
 
 	screen.Show()
-	frameTime := time.NewTicker(500 * time.Millisecond)
+
+	var currentEnemy uint32 = 0
+	frameTime := time.NewTicker(time.Duration(tick) * time.Millisecond)
 	defer frameTime.Stop()
 
-	// TODO Need To Keep Track The Total Enemy And Their State
+	eventChan := make(chan tcell.Event, 1)
+
+	go func() {
+		for {
+			ev := screen.PollEvent()
+			eventChan <- ev
+		}
+	}()
+
+	//TODO How To Render Multiple Enemies
+	// Solution that im thinking right now is loop enemy per tick
 	for {
 		select {
-		case <-frameTime.C:
-
-			for _, enemy := range enemies {
-				enemy.GoLeft()
-				screen.SetContent(enemy.W, enemy.H, enemy.Type, nil, tcell.StyleDefault)
-				screen.SetContent(enemy.W-1, enemy.H, ' ', nil, tcell.StyleDefault)
-			}
-
-			screen.Show()
-		default:
-			if screen.HasPendingEvent() {
-				ev := screen.PollEvent()
-				switch ev := ev.(type) {
-				case *tcell.EventKey:
-					if ev.Key() == tcell.KeyEscape || ev.Rune() == 'q' {
-						screen.Fini()
-						os.Exit(0)
-					}
+		case ev := <-eventChan:
+			switch ev := ev.(type) {
+			case *tcell.EventKey:
+				if ev.Key() == tcell.KeyEscape || ev.Rune() == 'q' {
+					screen.Fini()
+					os.Exit(0)
 				}
 			}
+		case <-frameTime.C:
+			for index, enemy := range enemies {
+				screen.SetContent(enemy.W-2, enemy.H, ' ', nil, tcell.StyleDefault) // Removing Track
+
+				enemy.GoLeft()
+				screen.SetContent(enemy.W, enemy.H, enemy.Type, nil, tcell.StyleDefault)
+
+				log.Printf("%d Location: W: %d, H: %d", index, enemy.W, enemy.H)
+			}
+
+			currentEnemy += 1
+
+			screen.Show()
 		}
 	}
 }

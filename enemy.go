@@ -10,7 +10,7 @@ type Enemy struct {
 }
 
 func (enemy *Enemy) GoLeft() {
-	enemy.W += 1
+	enemy.W += 2
 }
 
 func (enemy *Enemy) GoTop() {
@@ -27,6 +27,12 @@ func (enemy *Enemy) GoRight() {
 
 func GenerateEnemy() []*Enemy {
 	return []*Enemy{
+		{
+			H:    height / 2,
+			W:    0,
+			Type: GRUNT,
+			HP:   3,
+		},
 		{
 			H:    height / 2,
 			W:    0,
