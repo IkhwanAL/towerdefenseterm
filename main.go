@@ -1,13 +1,16 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"os"
+	"os/signal"
+	"time"
+
+	"github.com/gdamore/tcell/v2"
 )
 
 const height = 25
 const width = 120
-
-const enemy = "█"
 
 var towerLocation = [][]int{
 	{(25 / 2) - 4, 100, 4},
@@ -25,60 +28,50 @@ var towerLocation = [][]int{
 
 func generateTowerPlaceholder(
 	towerLocation [][]int,
-	gameMap *[height][width]string,
+	screen tcell.Screen,
 ) {
 	for i := range towerLocation {
 		locationToPlace := towerLocation[i]
 
-		gameMap[locationToPlace[0]-1][locationToPlace[1]-1] = " "
-		gameMap[locationToPlace[0]-1][locationToPlace[1]] = " "
-		gameMap[locationToPlace[0]-1][locationToPlace[1]+1] = " "
-		gameMap[locationToPlace[0]][locationToPlace[1]-1] = " "
-		gameMap[locationToPlace[0]][locationToPlace[1]+1] = " "
-		gameMap[locationToPlace[0]][locationToPlace[1]] = "*"
-		gameMap[locationToPlace[0]+1][locationToPlace[1]-1] = " "
-		gameMap[locationToPlace[0]+1][locationToPlace[1]] = " "
-		gameMap[locationToPlace[0]+1][locationToPlace[1]+1] = " "
+		screen.SetContent(locationToPlace[1]-1, locationToPlace[0]-1, ' ', nil, tcell.StyleDefault)
+		screen.SetContent(locationToPlace[1], locationToPlace[0]-1, ' ', nil, tcell.StyleDefault)
+		screen.SetContent(locationToPlace[1]+1, locationToPlace[0]-1, ' ', nil, tcell.StyleDefault)
+
+		screen.SetContent(locationToPlace[1]-1, locationToPlace[0], ' ', nil, tcell.StyleDefault)
+		screen.SetContent(locationToPlace[1], locationToPlace[0], '*', nil, tcell.StyleDefault)
+		screen.SetContent(locationToPlace[1]+1, locationToPlace[0], ' ', nil, tcell.StyleDefault)
+
+		screen.SetContent(locationToPlace[1]-1, locationToPlace[0]+1, ' ', nil, tcell.StyleDefault)
+		screen.SetContent(locationToPlace[1], locationToPlace[0]+1, ' ', nil, tcell.StyleDefault)
+		screen.SetContent(locationToPlace[1]+1, locationToPlace[0]+1, ' ', nil, tcell.StyleDefault)
 	}
 }
 
-func isInsideTowerLocation(h, w int, towerLocation [][]int) bool {
-	for i := range towerLocation {
-		location := towerLocation[i]
+func interrupt(screen tcell.Screen, notify chan os.Signal) {
+	signal.Notify(notify, os.Interrupt)
 
-		hLocation := location[0]
-		wLocation := location[1]
-
-		if h == hLocation-1 {
-			return true
-		}
-
-		if h == hLocation {
-			return true
-		}
-
-		if h == hLocation+1 {
-			return true
-		}
-
-		if w == wLocation-1 {
-			return true
-		}
-
-		if w == wLocation {
-			return true
-		}
-
-		if w == wLocation+1 {
-			return true
-		}
-	}
-
-	return false
+	go func() {
+		<-notify // Receive
+		screen.Fini()
+		os.Exit(0)
+	}()
 }
-
 func main() {
-	var gameMap [height][width]string
+	screen, err := tcell.NewScreen()
+
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	if err = screen.Init(); err != nil {
+		log.Fatal(err.Error())
+	}
+
+	var notifyChan chan os.Signal = make(chan os.Signal, 1)
+
+	interrupt(screen, notifyChan)
+
+	screen.Clear()
 
 	// Generate Road
 	for h := range height {
@@ -88,39 +81,48 @@ func main() {
 			rightJunction := (height / 2) + 1
 
 			if h == leftJunction || h == road || h == rightJunction {
-				gameMap[h][w] = " "
+				screen.SetContent(w, h, ' ', nil, tcell.StyleDefault)
 			} else {
-				gameMap[h][w] = "#"
+				screen.SetContent(w, h, '#', nil, tcell.StyleDefault)
 			}
 		}
 	}
 
-	generateTowerPlaceholder(towerLocation, &gameMap)
+	generateTowerPlaceholder(towerLocation, screen)
 
-	//TODO Update Every frame
+	enemies := GenerateEnemy()
 
-	totalEnemy := 0
-	const maxTotalEnemy = 1
-
-	// for {
-	for h := range gameMap {
-		for w := range gameMap[h] {
-			marker := gameMap[h][w]
-
-			inTowerLocation := isInsideTowerLocation(h, w, towerLocation)
-
-			// How to Render Enemy
-			if marker == " " && totalEnemy < maxTotalEnemy && !inTowerLocation {
-				fmt.Print(enemy)
-				totalEnemy += 1
-				continue
-			}
-
-			fmt.Print(marker)
-
-		}
-		fmt.Print("\n")
+	for _, enemy := range enemies {
+		screen.SetContent(enemy.W, enemy.H, enemy.Type, nil, tcell.StyleDefault)
 	}
 
-	// }
+	screen.Show()
+	frameTime := time.NewTicker(500 * time.Millisecond)
+	defer frameTime.Stop()
+
+	// TODO Need To Keep Track The Total Enemy And Their State
+	for {
+		select {
+		case <-frameTime.C:
+
+			for _, enemy := range enemies {
+				enemy.GoLeft()
+				screen.SetContent(enemy.W, enemy.H, enemy.Type, nil, tcell.StyleDefault)
+				screen.SetContent(enemy.W-1, enemy.H, ' ', nil, tcell.StyleDefault)
+			}
+
+			screen.Show()
+		default:
+			if screen.HasPendingEvent() {
+				ev := screen.PollEvent()
+				switch ev := ev.(type) {
+				case *tcell.EventKey:
+					if ev.Key() == tcell.KeyEscape || ev.Rune() == 'q' {
+						screen.Fini()
+						os.Exit(0)
+					}
+				}
+			}
+		}
+	}
 }
