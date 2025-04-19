@@ -56,6 +56,24 @@ func interrupt(screen tcell.Screen, notify chan os.Signal) {
 		os.Exit(0)
 	}()
 }
+
+func placeTower(screen tcell.Screen, ev *tcell.EventMouse) {
+	x, y := ev.Position()
+
+	screen.SetContent(x-1, y-1, '*', nil, tcell.StyleDefault)
+	screen.SetContent(x, y-1, '*', nil, tcell.StyleDefault)
+	screen.SetContent(x+1, y-1, '*', nil, tcell.StyleDefault)
+
+	screen.SetContent(x-1, y, '*', nil, tcell.StyleDefault)
+	screen.SetContent(x, y, '*', nil, tcell.StyleDefault)
+	screen.SetContent(x+1, y, '*', nil, tcell.StyleDefault)
+
+	screen.SetContent(x-1, y+1, '*', nil, tcell.StyleDefault)
+	screen.SetContent(x, y+1, '*', nil, tcell.StyleDefault)
+	screen.SetContent(x+1, y+1, '*', nil, tcell.StyleDefault)
+
+}
+
 func main() {
 	logFile, err := os.OpenFile("debug.log", os.O_RDWR|os.O_APPEND|os.O_CREATE, 0666)
 
@@ -110,6 +128,7 @@ func main() {
 	}
 
 	screen.Show()
+	screen.EnableMouse()
 
 	var currentEnemy uint32 = 0
 	frameTime := time.NewTicker(time.Duration(tick) * time.Millisecond)
@@ -133,8 +152,15 @@ func main() {
 				if ev.Key() == tcell.KeyEscape || ev.Rune() == 'q' {
 					screen.Fini()
 					os.Exit(0)
+					break
+				}
+			case *tcell.EventMouse:
+				if ev.Buttons() == tcell.Button1 {
+					placeTower(screen, ev)
 				}
 			}
+
+			screen.Show()
 		case <-frameTime.C:
 			for index, enemy := range enemies {
 				screen.SetContent(enemy.W-2, enemy.H, ' ', nil, tcell.StyleDefault) // Removing Track
