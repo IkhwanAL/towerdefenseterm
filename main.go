@@ -124,8 +124,7 @@ func main() {
 		}
 	}()
 
-	//TODO How To Render Multiple Enemies
-	// Solution that im thinking right now is loop enemy per tick
+	// TODO Select Tower
 	for {
 		select {
 		case ev := <-eventChan:
