@@ -39,5 +39,23 @@ func GenerateEnemy() []*Enemy {
 			Type: GRUNT,
 			HP:   3,
 		},
+		{
+			H:    height / 2,
+			W:    0,
+			Type: GRUNT,
+			HP:   3,
+		},
+		{
+			H:    height / 2,
+			W:    0,
+			Type: GRUNT,
+			HP:   3,
+		},
+		{
+			H:    height / 2,
+			W:    0,
+			Type: GRUNT,
+			HP:   3,
+		},
 	}
 }

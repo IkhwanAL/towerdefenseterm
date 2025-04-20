@@ -57,8 +57,31 @@ func interrupt(screen tcell.Screen, notify chan os.Signal) {
 	}()
 }
 
-func placeTower(screen tcell.Screen, ev *tcell.EventMouse) {
+func placeTower(screen tcell.Screen, ev *tcell.EventMouse, towerLocation [][]int) {
 	x, y := ev.Position()
+
+	locationAccepted := false
+
+	for i := range towerLocation {
+		location := towerLocation[i]
+
+		if location[0]-1 == y || location[0]+1 == y {
+			return
+		}
+
+		if location[1]-1 == x || location[1]+1 == x {
+			return
+		}
+
+		if location[0] == y && location[1] == x {
+			locationAccepted = true
+			break
+		}
+	}
+
+	if !locationAccepted {
+		return
+	}
 
 	screen.SetContent(x-1, y-1, '*', nil, tcell.StyleDefault)
 	screen.SetContent(x, y-1, '*', nil, tcell.StyleDefault)
@@ -130,7 +153,6 @@ func main() {
 	screen.Show()
 	screen.EnableMouse()
 
-	var currentEnemy uint32 = 0
 	frameTime := time.NewTicker(time.Duration(tick) * time.Millisecond)
 	defer frameTime.Stop()
 
@@ -143,7 +165,6 @@ func main() {
 		}
 	}()
 
-	// TODO Select Tower
 	for {
 		select {
 		case ev := <-eventChan:
@@ -156,12 +177,14 @@ func main() {
 				}
 			case *tcell.EventMouse:
 				if ev.Buttons() == tcell.Button1 {
-					placeTower(screen, ev)
+					placeTower(screen, ev, towerLocation)
 				}
 			}
 
 			screen.Show()
 		case <-frameTime.C:
+			// TODO Still Can't Handle More than 2 Unit
+
 			for index, enemy := range enemies {
 				screen.SetContent(enemy.W-2, enemy.H, ' ', nil, tcell.StyleDefault) // Removing Track
 
@@ -170,8 +193,6 @@ func main() {
 
 				log.Printf("%d Location: W: %d, H: %d", index, enemy.W, enemy.H)
 			}
-
-			currentEnemy += 1
 
 			screen.Show()
 		}
