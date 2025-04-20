@@ -182,7 +182,6 @@ func main() {
 
 			screen.Show()
 		case <-frameTime.C:
-			// TODO Still Can't Handle More than 2 Unit
 
 			now := time.Now()
 
