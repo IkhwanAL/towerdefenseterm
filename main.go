@@ -98,7 +98,7 @@ func placeTower(screen tcell.Screen, ev *tcell.EventMouse, towerLocation [][]int
 }
 
 func main() {
-	logFile, err := os.OpenFile("debug.log", os.O_RDWR|os.O_APPEND|os.O_CREATE, 0666)
+	logFile, err := os.OpenFile("debug.log", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
 
 	if err != nil {
 		log.Fatal(err.Error())
@@ -106,7 +106,6 @@ func main() {
 
 	defer logFile.Close()
 
-	log.SetFlags(log.Default().Flags())
 	log.SetOutput(logFile)
 
 	screen, err := tcell.NewScreen()
@@ -142,9 +141,9 @@ func main() {
 
 	generateTowerPlaceholder(towerLocation, screen)
 
-	tick := 1000
+	tick := 500 * time.Millisecond
 
-	enemies := GenerateEnemy()
+	enemies := GenerateEnemy(tick)
 
 	for _, enemy := range enemies {
 		screen.SetContent(enemy.W, enemy.H, enemy.Type, nil, tcell.StyleDefault)
@@ -153,7 +152,7 @@ func main() {
 	screen.Show()
 	screen.EnableMouse()
 
-	frameTime := time.NewTicker(time.Duration(tick) * time.Millisecond)
+	frameTime := time.NewTicker(tick)
 	defer frameTime.Stop()
 
 	eventChan := make(chan tcell.Event, 1)
@@ -185,13 +184,32 @@ func main() {
 		case <-frameTime.C:
 			// TODO Still Can't Handle More than 2 Unit
 
-			for index, enemy := range enemies {
-				screen.SetContent(enemy.W-2, enemy.H, ' ', nil, tcell.StyleDefault) // Removing Track
+			now := time.Now()
 
-				enemy.GoLeft()
-				screen.SetContent(enemy.W, enemy.H, enemy.Type, nil, tcell.StyleDefault)
+			for index := range enemies {
+				enemy := &enemies[index]
 
-				log.Printf("%d Location: W: %d, H: %d", index, enemy.W, enemy.H)
+				lastMoved := now.Sub(enemy.LastMoved)
+
+				log.Printf("Unit: %d", index)
+				log.Printf("Last Moved: %s ", lastMoved)
+				log.Printf("Last Moved (Time): %s", enemy.LastMoved)
+				log.Printf("interval: %s", enemy.Interval)
+				log.Printf("Tick (Time): %s", now)
+
+				if lastMoved >= enemy.Interval {
+					screen.SetContent(enemy.W, enemy.H, ' ', nil, tcell.StyleDefault) // Removing Track
+
+					enemy.GoRight()
+					enemy.LastMoved = now
+					color := tcell.NewRGBColor(
+						int32(enemy.Color[0]),
+						int32(enemy.Color[1]),
+						int32(enemy.Color[2]),
+					)
+					screen.SetContent(enemy.W, enemy.H, enemy.Type, nil, tcell.StyleDefault.Foreground(color))
+				}
+				log.Print("\n")
 			}
 
 			screen.Show()
