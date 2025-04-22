@@ -1,4 +1,4 @@
-package main
+package enemy
 
 import "time"
 
@@ -15,22 +15,22 @@ type Enemy struct {
 }
 
 func (enemy *Enemy) GoLeft() {
-	enemy.W -= 1
+	enemy.W -= 2
 }
 
 func (enemy *Enemy) GoTop() {
-	enemy.H += 1
+	enemy.H += 2
 }
 
 func (enemy *Enemy) GoBottom() {
-	enemy.H -= 1
+	enemy.H -= 2
 }
 
 func (enemy *Enemy) GoRight() {
 	enemy.W += 2
 }
 
-func GenerateEnemy(baseInterval time.Duration) []Enemy {
+func GenerateEnemy(baseInterval time.Duration, height int) []Enemy {
 	now := time.Now()
 
 	return []Enemy{

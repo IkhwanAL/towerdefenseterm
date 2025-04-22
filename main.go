@@ -6,46 +6,13 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/IkhwanAL/towerdefenseterm/internal/enemy"
+	"github.com/IkhwanAL/towerdefenseterm/internal/tower"
 	"github.com/gdamore/tcell/v2"
 )
 
 const height = 25
 const width = 120
-
-var towerLocation = [][]int{
-	{(25 / 2) - 4, 100, 4},
-	{(25 / 2) - 4, 90, 4},
-	{(25 / 2) - 4, 80, 4},
-	{(25 / 2) - 4, 50, 4},
-	{(25 / 2) - 4, 30, 4},
-
-	{(25 / 2) + 4, 30, 4},
-	{(25 / 2) + 4, 50, 4},
-	{(25 / 2) + 4, 80, 4},
-	{(25 / 2) + 4, 90, 4},
-	{(25 / 2) + 4, 100, 4},
-}
-
-func generateTowerPlaceholder(
-	towerLocation [][]int,
-	screen tcell.Screen,
-) {
-	for i := range towerLocation {
-		locationToPlace := towerLocation[i]
-
-		screen.SetContent(locationToPlace[1]-1, locationToPlace[0]-1, ' ', nil, tcell.StyleDefault)
-		screen.SetContent(locationToPlace[1], locationToPlace[0]-1, ' ', nil, tcell.StyleDefault)
-		screen.SetContent(locationToPlace[1]+1, locationToPlace[0]-1, ' ', nil, tcell.StyleDefault)
-
-		screen.SetContent(locationToPlace[1]-1, locationToPlace[0], ' ', nil, tcell.StyleDefault)
-		screen.SetContent(locationToPlace[1], locationToPlace[0], ' ', nil, tcell.StyleDefault)
-		screen.SetContent(locationToPlace[1]+1, locationToPlace[0], ' ', nil, tcell.StyleDefault)
-
-		screen.SetContent(locationToPlace[1]-1, locationToPlace[0]+1, ' ', nil, tcell.StyleDefault)
-		screen.SetContent(locationToPlace[1], locationToPlace[0]+1, ' ', nil, tcell.StyleDefault)
-		screen.SetContent(locationToPlace[1]+1, locationToPlace[0]+1, ' ', nil, tcell.StyleDefault)
-	}
-}
 
 func interrupt(screen tcell.Screen, notify chan os.Signal) {
 	signal.Notify(notify, os.Interrupt)
@@ -55,46 +22,6 @@ func interrupt(screen tcell.Screen, notify chan os.Signal) {
 		screen.Fini()
 		os.Exit(0)
 	}()
-}
-
-func placeTower(screen tcell.Screen, ev *tcell.EventMouse, towerLocation [][]int) {
-	x, y := ev.Position()
-
-	locationAccepted := false
-
-	for i := range towerLocation {
-		location := towerLocation[i]
-
-		if location[0]-1 == y || location[0]+1 == y {
-			return
-		}
-
-		if location[1]-1 == x || location[1]+1 == x {
-			return
-		}
-
-		if location[0] == y && location[1] == x {
-			locationAccepted = true
-			break
-		}
-	}
-
-	if !locationAccepted {
-		return
-	}
-
-	screen.SetContent(x-1, y-1, '╭', nil, tcell.StyleDefault)
-	screen.SetContent(x, y-1, '-', nil, tcell.StyleDefault)
-	screen.SetContent(x+1, y-1, '╮', nil, tcell.StyleDefault)
-
-	screen.SetContent(x-1, y, '|', nil, tcell.StyleDefault)
-	screen.SetContent(x, y, '*', nil, tcell.StyleDefault)
-	screen.SetContent(x+1, y, '|', nil, tcell.StyleDefault)
-
-	screen.SetContent(x-1, y+1, '╰', nil, tcell.StyleDefault)
-	screen.SetContent(x, y+1, '-', nil, tcell.StyleDefault)
-	screen.SetContent(x+1, y+1, '╯', nil, tcell.StyleDefault)
-
 }
 
 func main() {
@@ -139,11 +66,11 @@ func main() {
 		}
 	}
 
-	generateTowerPlaceholder(towerLocation, screen)
+	tower.GenerateTowerPlaceholder(tower.TowerLocation, screen)
 
 	tick := 500 * time.Millisecond
 
-	enemies := GenerateEnemy(tick)
+	enemies := enemy.GenerateEnemy(tick, height)
 
 	for _, enemy := range enemies {
 		screen.SetContent(enemy.W, enemy.H, ' ', nil, tcell.StyleDefault)
@@ -176,7 +103,7 @@ func main() {
 				}
 			case *tcell.EventMouse:
 				if ev.Buttons() == tcell.Button1 {
-					placeTower(screen, ev, towerLocation)
+					tower.PlaceTower(screen, ev, tower.TowerLocation)
 				}
 			}
 
