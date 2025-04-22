@@ -83,17 +83,17 @@ func placeTower(screen tcell.Screen, ev *tcell.EventMouse, towerLocation [][]int
 		return
 	}
 
-	screen.SetContent(x-1, y-1, '*', nil, tcell.StyleDefault)
-	screen.SetContent(x, y-1, '*', nil, tcell.StyleDefault)
-	screen.SetContent(x+1, y-1, '*', nil, tcell.StyleDefault)
+	screen.SetContent(x-1, y-1, '╭', nil, tcell.StyleDefault)
+	screen.SetContent(x, y-1, '-', nil, tcell.StyleDefault)
+	screen.SetContent(x+1, y-1, '╮', nil, tcell.StyleDefault)
 
-	screen.SetContent(x-1, y, '*', nil, tcell.StyleDefault)
+	screen.SetContent(x-1, y, '|', nil, tcell.StyleDefault)
 	screen.SetContent(x, y, '*', nil, tcell.StyleDefault)
-	screen.SetContent(x+1, y, '*', nil, tcell.StyleDefault)
+	screen.SetContent(x+1, y, '|', nil, tcell.StyleDefault)
 
-	screen.SetContent(x-1, y+1, '*', nil, tcell.StyleDefault)
-	screen.SetContent(x, y+1, '*', nil, tcell.StyleDefault)
-	screen.SetContent(x+1, y+1, '*', nil, tcell.StyleDefault)
+	screen.SetContent(x-1, y+1, '╰', nil, tcell.StyleDefault)
+	screen.SetContent(x, y+1, '-', nil, tcell.StyleDefault)
+	screen.SetContent(x+1, y+1, '╯', nil, tcell.StyleDefault)
 
 }
 
@@ -146,7 +146,7 @@ func main() {
 	enemies := GenerateEnemy(tick)
 
 	for _, enemy := range enemies {
-		screen.SetContent(enemy.W, enemy.H, enemy.Type, nil, tcell.StyleDefault)
+		screen.SetContent(enemy.W, enemy.H, ' ', nil, tcell.StyleDefault)
 	}
 
 	screen.Show()
@@ -163,7 +163,7 @@ func main() {
 			eventChan <- ev
 		}
 	}()
-
+	// TODO Able To Detect Unit is Closer to Tower
 	for {
 		select {
 		case ev := <-eventChan:

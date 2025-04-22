@@ -36,7 +36,7 @@ func GenerateEnemy(baseInterval time.Duration) []Enemy {
 	return []Enemy{
 		{
 			H:         height / 2,
-			W:         0,
+			W:         -2,
 			Type:      GRUNT,
 			HP:        3,
 			Interval:  baseInterval,
@@ -45,7 +45,7 @@ func GenerateEnemy(baseInterval time.Duration) []Enemy {
 		},
 		{
 			H:         height / 2,
-			W:         0,
+			W:         -2,
 			Type:      GRUNT,
 			HP:        3,
 			Interval:  baseInterval,
@@ -54,7 +54,7 @@ func GenerateEnemy(baseInterval time.Duration) []Enemy {
 		},
 		{
 			H:         height / 2,
-			W:         0,
+			W:         -2,
 			Type:      GRUNT,
 			HP:        3,
 			Interval:  baseInterval,
