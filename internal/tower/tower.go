@@ -37,7 +37,7 @@ func GenerateTowerPlaceholder(
 	}
 }
 
-func PlaceTower(screen tcell.Screen, ev *tcell.EventMouse, towerLocation [][]int) {
+func AllowedToPlaceTower(ev *tcell.EventMouse, towerLocation [][]int) (int, int) {
 	x, y := ev.Position()
 
 	locationAccepted := false
@@ -46,11 +46,11 @@ func PlaceTower(screen tcell.Screen, ev *tcell.EventMouse, towerLocation [][]int
 		location := towerLocation[i]
 
 		if location[0]-1 == y || location[0]+1 == y {
-			return
+			return -1, -1
 		}
 
 		if location[1]-1 == x || location[1]+1 == x {
-			return
+			return -1, -1
 		}
 
 		if location[0] == y && location[1] == x {
@@ -60,9 +60,14 @@ func PlaceTower(screen tcell.Screen, ev *tcell.EventMouse, towerLocation [][]int
 	}
 
 	if !locationAccepted {
-		return
+		return -1, -1
 	}
 
+	return x, y
+
+}
+
+func PlaceATower(screen tcell.Screen, x, y int) {
 	screen.SetContent(x-1, y-1, '╭', nil, tcell.StyleDefault)
 	screen.SetContent(x, y-1, '-', nil, tcell.StyleDefault)
 	screen.SetContent(x+1, y-1, '╮', nil, tcell.StyleDefault)
