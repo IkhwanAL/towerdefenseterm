@@ -37,9 +37,7 @@ func GenerateTowerPlaceholder(
 	}
 }
 
-func AllowedToPlaceTower(ev *tcell.EventMouse, towerLocation [][]int) (int, int) {
-	x, y := ev.Position()
-
+func AllowedToPlaceTower(x, y int, towerLocation [][]int) (int, int) {
 	locationAccepted := false
 
 	for i := range towerLocation {

@@ -103,7 +103,9 @@ func main() {
 				}
 			case *tcell.EventMouse:
 				if ev.Buttons() == tcell.Button1 {
-					x, y := tower.AllowedToPlaceTower(ev, tower.TowerLocation)
+					x, y := ev.Position()
+
+					x, y = tower.AllowedToPlaceTower(x, y, tower.TowerLocation)
 
 					if x == -1 && y == -1 {
 						break
