@@ -14,6 +14,8 @@ import (
 const height = 25
 const width = 120
 
+const losRad = 5
+
 func interrupt(screen tcell.Screen, notify chan os.Signal) {
 	signal.Notify(notify, os.Interrupt)
 
@@ -23,7 +25,6 @@ func interrupt(screen tcell.Screen, notify chan os.Signal) {
 		os.Exit(0)
 	}()
 }
-
 func main() {
 	logFile, err := os.OpenFile("debug.log", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
 
@@ -90,7 +91,11 @@ func main() {
 			eventChan <- ev
 		}
 	}()
+
+	var availableTower []tower.Tower
+
 	// TODO Able To Detect Unit is Closer to Tower
+	// The Plan is To Use Euclidean Formula To get the distance between two unit
 	for {
 		select {
 		case ev := <-eventChan:
@@ -111,7 +116,9 @@ func main() {
 						break
 					}
 
-					tower.PlaceATower(screen, x, y)
+					createdTower := tower.PlaceATower(screen, x, y)
+
+					availableTower = append(availableTower, *createdTower)
 				}
 			}
 
@@ -119,6 +126,8 @@ func main() {
 		case <-frameTime.C:
 
 			now := time.Now()
+
+			var enemyMoved []enemy.Enemy
 
 			for index := range enemies {
 				enemy := &enemies[index]
@@ -142,8 +151,28 @@ func main() {
 						int32(enemy.Color[2]),
 					)
 					screen.SetContent(enemy.W, enemy.H, enemy.Type, nil, tcell.StyleDefault.Foreground(color))
+					enemyMoved = append(enemyMoved, *enemy)
 				}
 				log.Print("\n")
+			}
+
+			for i := range availableTower {
+				watchTower := availableTower[i]
+
+				for j := range enemyMoved {
+					target := enemyMoved[j]
+
+					isInArea := watchTower.UnitCloseToTower(
+						float64(watchTower.W),
+						float64(target.W),
+						float64(watchTower.H),
+						float64(target.H),
+					)
+
+					if isInArea {
+						screen.SetContent(0, 0, 'A', nil, tcell.StyleDefault)
+					}
+				}
 			}
 
 			screen.Show()

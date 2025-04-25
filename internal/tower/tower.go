@@ -1,7 +1,24 @@
 package tower
 
-import "github.com/gdamore/tcell/v2"
+import (
+	"math"
 
+	"github.com/gdamore/tcell/v2"
+)
+
+type Tower struct {
+	W   int
+	H   int
+	LOS int
+}
+
+func (tower *Tower) UnitCloseToTower(px, py, qx, qy float64) bool {
+	unitPosition := euclideanFormula(px, py, qx, qy)
+
+	return unitPosition <= tower.LOS
+}
+
+// [H, W]
 var TowerLocation = [][]int{
 	{(25 / 2) - 4, 100},
 	{(25 / 2) - 4, 90},
@@ -65,7 +82,7 @@ func AllowedToPlaceTower(x, y int, towerLocation [][]int) (int, int) {
 
 }
 
-func PlaceATower(screen tcell.Screen, x, y int) {
+func PlaceATower(screen tcell.Screen, x, y int) *Tower {
 	screen.SetContent(x-1, y-1, '╭', nil, tcell.StyleDefault)
 	screen.SetContent(x, y-1, '-', nil, tcell.StyleDefault)
 	screen.SetContent(x+1, y-1, '╮', nil, tcell.StyleDefault)
@@ -77,4 +94,17 @@ func PlaceATower(screen tcell.Screen, x, y int) {
 	screen.SetContent(x-1, y+1, '╰', nil, tcell.StyleDefault)
 	screen.SetContent(x, y+1, '-', nil, tcell.StyleDefault)
 	screen.SetContent(x+1, y+1, '╯', nil, tcell.StyleDefault)
+
+	return &Tower{
+		W:   x,
+		H:   y,
+		LOS: 4,
+	}
+}
+
+func euclideanFormula(px, py, qx, qy float64) int {
+	x := math.Pow(qx-px, 1)
+	y := math.Pow(qy-py, 1)
+
+	return int(math.Sqrt(x + y))
 }
