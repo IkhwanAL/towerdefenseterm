@@ -1,6 +1,7 @@
 package tower
 
 import (
+	"log"
 	"math"
 
 	"github.com/gdamore/tcell/v2"
@@ -14,6 +15,8 @@ type Tower struct {
 
 func (tower *Tower) UnitCloseToTower(px, py, qx, qy float64) bool {
 	unitPosition := euclideanFormula(px, py, qx, qy)
+
+	log.Printf("Position %d", unitPosition)
 
 	return unitPosition <= tower.LOS
 }
@@ -103,8 +106,8 @@ func PlaceATower(screen tcell.Screen, x, y int) *Tower {
 }
 
 func euclideanFormula(px, py, qx, qy float64) int {
-	x := math.Pow(qx-px, 1)
-	y := math.Pow(qy-py, 1)
+	x := math.Pow(qx-px, 2)
+	y := math.Pow(qy-py, 2)
 
 	return int(math.Sqrt(x + y))
 }

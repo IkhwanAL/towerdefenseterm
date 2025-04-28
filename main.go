@@ -95,7 +95,7 @@ func main() {
 	var availableTower []tower.Tower
 
 	// TODO Able To Detect Unit is Closer to Tower
-	// The Plan is To Use Euclidean Formula To get the distance between two unit
+	// TODO Able To Shoot And Unit Take Damage
 	for {
 		select {
 		case ev := <-eventChan:
@@ -119,6 +119,8 @@ func main() {
 					createdTower := tower.PlaceATower(screen, x, y)
 
 					availableTower = append(availableTower, *createdTower)
+
+					log.Print("I Place Tower")
 				}
 			}
 
@@ -134,12 +136,6 @@ func main() {
 
 				lastMoved := now.Sub(enemy.LastMoved)
 
-				log.Printf("Unit: %d", index)
-				log.Printf("Last Moved: %s ", lastMoved)
-				log.Printf("Last Moved (Time): %s", enemy.LastMoved)
-				log.Printf("interval: %s", enemy.Interval)
-				log.Printf("Tick (Time): %s", now)
-
 				if lastMoved >= enemy.Interval {
 					screen.SetContent(enemy.W, enemy.H, ' ', nil, tcell.StyleDefault) // Removing Track
 
@@ -153,7 +149,6 @@ func main() {
 					screen.SetContent(enemy.W, enemy.H, enemy.Type, nil, tcell.StyleDefault.Foreground(color))
 					enemyMoved = append(enemyMoved, *enemy)
 				}
-				log.Print("\n")
 			}
 
 			for i := range availableTower {
@@ -163,12 +158,16 @@ func main() {
 					target := enemyMoved[j]
 
 					isInArea := watchTower.UnitCloseToTower(
-						float64(watchTower.W),
 						float64(target.W),
-						float64(watchTower.H),
 						float64(target.H),
+						float64(watchTower.W),
+						float64(watchTower.H),
 					)
 
+					log.Printf(
+						"Target X: %d, Target Y:%d, Tower X: %d, Tower Y:%d",
+						target.W, target.H, watchTower.W, watchTower.H,
+					)
 					if isInArea {
 						screen.SetContent(0, 0, 'A', nil, tcell.StyleDefault)
 					}

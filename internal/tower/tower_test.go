@@ -33,3 +33,27 @@ func TestTowerLocationDetection(t *testing.T) {
 		}
 	}
 }
+
+func TestUnitDistance(t *testing.T) {
+	var tableTest = []map[string]any{
+		{
+			"input":  []float64{30, 12, 30, 8},
+			"output": 4,
+		},
+		{
+			"input":  []float64{10, 12, 30, 8},
+			"output": 20,
+		},
+	}
+
+	for _, test := range tableTest {
+		point := test["input"].([]float64)
+		expectResult := test["output"].(int)
+
+		actualResult := euclideanFormula(point[0], point[1], point[2], point[3])
+
+		if expectResult != actualResult {
+			t.Errorf("Actual Result is %d, Which System Expect %d", actualResult, expectResult)
+		}
+	}
+}
