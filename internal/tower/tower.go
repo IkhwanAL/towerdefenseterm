@@ -1,22 +1,22 @@
 package tower
 
 import (
-	"log"
 	"math"
+	"time"
 
 	"github.com/gdamore/tcell/v2"
 )
 
 type Tower struct {
-	W   int
-	H   int
-	LOS int
+	W              int
+	H              int
+	LOS            int
+	AttackSpeed    time.Duration
+	LastTimeAttack time.Time
 }
 
 func (tower *Tower) UnitCloseToTower(px, py, qx, qy float64) bool {
 	unitPosition := euclideanFormula(px, py, qx, qy)
-
-	log.Printf("Position %d", unitPosition)
 
 	return unitPosition <= tower.LOS
 }
@@ -85,7 +85,16 @@ func AllowedToPlaceTower(x, y int, towerLocation [][]int) (int, int) {
 
 }
 
-func PlaceATower(screen tcell.Screen, x, y int) *Tower {
+func (tower *Tower) Attack() int {
+	tower.LastTimeAttack = time.Now()
+	return 1
+}
+
+func (tower *Tower) CanAttackNow() bool {
+	return true
+}
+
+func PlaceATower(screen tcell.Screen, x, y int, attackSpeed int) *Tower {
 	screen.SetContent(x-1, y-1, '╭', nil, tcell.StyleDefault)
 	screen.SetContent(x, y-1, '-', nil, tcell.StyleDefault)
 	screen.SetContent(x+1, y-1, '╮', nil, tcell.StyleDefault)
@@ -99,9 +108,10 @@ func PlaceATower(screen tcell.Screen, x, y int) *Tower {
 	screen.SetContent(x+1, y+1, '╯', nil, tcell.StyleDefault)
 
 	return &Tower{
-		W:   x,
-		H:   y,
-		LOS: 4,
+		W:           x,
+		H:           y,
+		LOS:         4,
+		AttackSpeed: time.Duration(attackSpeed * int(time.Millisecond)),
 	}
 }
 
