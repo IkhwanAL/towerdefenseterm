@@ -9,15 +9,15 @@ import (
 const GRUNT = '█'
 
 type Enemy struct {
-	H             int
-	W             int
-	Type          rune
-	HP            int
-	Interval      time.Duration
-	LastMoved     time.Time
-	Color         []int
-	LastTimeHit   time.Time
-	FlashDuration time.Duration
+	H            int
+	W            int
+	Type         rune
+	HP           int
+	Interval     time.Duration
+	LastMoved    time.Time
+	Color        []int
+	LastTimeHit  time.Time
+	MustFlashing bool
 }
 
 func (enemy *Enemy) GoLeft() {
@@ -39,11 +39,7 @@ func (enemy *Enemy) GoRight() {
 func (enemy *Enemy) TakeDamage(amount int) {
 	enemy.HP -= amount
 	enemy.LastTimeHit = time.Now()
-	enemy.FlashDuration = 400 * time.Millisecond
-}
-
-func (enemy *Enemy) IsFlashing() bool {
-	return time.Since(enemy.LastTimeHit) < enemy.FlashDuration
+	enemy.MustFlashing = true
 }
 
 func (enemy *Enemy) Draw(screen tcell.Screen) {
@@ -53,7 +49,7 @@ func (enemy *Enemy) Draw(screen tcell.Screen) {
 		int32(enemy.Color[2]),
 	)
 
-	if enemy.IsFlashing() {
+	if enemy.MustFlashing {
 		color = tcell.ColorRed
 	}
 

@@ -69,7 +69,7 @@ func main() {
 
 	tower.GenerateTowerPlaceholder(tower.TowerLocation, screen)
 
-	tick := 250 * time.Millisecond
+	tick := 300 * time.Millisecond
 
 	enemies := enemy.GenerateEnemy(tick, height)
 
@@ -92,7 +92,7 @@ func main() {
 		}
 	}()
 
-	var availableTower []tower.Tower
+	var availableTower []*tower.Tower
 
 	// TODO Able To Shoot And Unit Take Damage
 	// TODO Able to Make Damage Tick With Red Color If it's get Hit
@@ -116,9 +116,9 @@ func main() {
 						break
 					}
 
-					createdTower := tower.PlaceATower(screen, x, y, 1)
+					createdTower := tower.PlaceATower(screen, x, y, 2000)
 
-					availableTower = append(availableTower, *createdTower)
+					availableTower = append(availableTower, createdTower)
 
 					log.Print("I Place Tower")
 				}
@@ -148,11 +148,11 @@ func main() {
 				}
 			}
 
-			for i := range availableTower {
-				watchTower := availableTower[i]
+			for _, watchTower := range availableTower {
+				// watchTower := availableTower[i]
 
-				for j := range enemyMoved {
-					target := enemyMoved[j]
+				for _, target := range enemyMoved {
+					//target := enemyMoved[j]
 
 					isInArea := watchTower.UnitCloseToTower(
 						float64(target.W),

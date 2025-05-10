@@ -1,6 +1,7 @@
 package tower
 
 import (
+	"log"
 	"math"
 	"time"
 
@@ -86,12 +87,15 @@ func AllowedToPlaceTower(x, y int, towerLocation [][]int) (int, int) {
 }
 
 func (tower *Tower) Attack() int {
+	log.Print("ATK")
 	tower.LastTimeAttack = time.Now()
+	// log.Printf("Update ATK %v", tower.LastTimeAttack)
 	return 1
 }
 
 func (tower *Tower) CanAttackNow() bool {
-	return true
+	log.Printf("Last Time Attack %v", tower.LastTimeAttack)
+	return time.Since(tower.LastTimeAttack) > tower.AttackSpeed
 }
 
 func PlaceATower(screen tcell.Screen, x, y int, attackSpeed int) *Tower {
@@ -108,10 +112,11 @@ func PlaceATower(screen tcell.Screen, x, y int, attackSpeed int) *Tower {
 	screen.SetContent(x+1, y+1, '╯', nil, tcell.StyleDefault)
 
 	return &Tower{
-		W:           x,
-		H:           y,
-		LOS:         4,
-		AttackSpeed: time.Duration(attackSpeed * int(time.Millisecond)),
+		W:              x,
+		H:              y,
+		LOS:            4,
+		AttackSpeed:    time.Duration(attackSpeed * int(time.Millisecond)),
+		LastTimeAttack: time.Now(),
 	}
 }
 
