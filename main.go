@@ -94,7 +94,7 @@ func main() {
 
 	var availableTower []*tower.Tower
 
-	// Make Enemy Disappear After Hp Drop 0
+	//TODO Make Enemy Disappear After Hp Drop 0
 	for {
 		select {
 		case ev := <-eventChan:
