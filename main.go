@@ -69,9 +69,9 @@ func main() {
 
 	tower.GenerateTowerPlaceholder(tower.TowerLocation, screen)
 
-	tick := 300 * time.Millisecond
+	tick := 100 * time.Millisecond
 
-	enemies := enemy.GenerateEnemy(tick, height)
+	enemies := enemy.GenerateEnemy(tick, height, tick*4)
 
 	for _, enemy := range enemies {
 		screen.SetContent(enemy.W, enemy.H, ' ', nil, tcell.StyleDefault)
@@ -94,8 +94,7 @@ func main() {
 
 	var availableTower []*tower.Tower
 
-	// TODO Able To Shoot And Unit Take Damage
-	// TODO Able to Make Damage Tick With Red Color If it's get Hit
+	// Make Enemy Disappear After Hp Drop 0
 	for {
 		select {
 		case ev := <-eventChan:
@@ -116,7 +115,7 @@ func main() {
 						break
 					}
 
-					createdTower := tower.PlaceATower(screen, x, y, 2000)
+					createdTower := tower.PlaceATower(screen, x, y, tick*7)
 
 					availableTower = append(availableTower, createdTower)
 
@@ -134,7 +133,7 @@ func main() {
 			for index := range enemies {
 				enemy := enemies[index]
 
-				log.Printf("HP %d", enemy.HP)
+				// log.Printf("HP %d", enemy.HP)
 
 				lastMoved := now.Sub(enemy.LastMoved)
 
@@ -143,17 +142,14 @@ func main() {
 
 					enemy.GoRight()
 					enemy.LastMoved = now
-					enemy.Draw(screen)
 					enemyMoved = append(enemyMoved, enemy)
 				}
+
+				enemy.Draw(screen)
 			}
 
 			for _, watchTower := range availableTower {
-				// watchTower := availableTower[i]
-
 				for _, target := range enemyMoved {
-					//target := enemyMoved[j]
-
 					isInArea := watchTower.UnitCloseToTower(
 						float64(target.W),
 						float64(target.H),
@@ -163,8 +159,9 @@ func main() {
 
 					if isInArea && watchTower.CanAttackNow() {
 						target.TakeDamage(watchTower.Attack())
-						target.Draw(screen)
 					}
+
+					target.Draw(screen)
 
 				}
 			}

@@ -1,6 +1,7 @@
 package enemy
 
 import (
+	"log"
 	"time"
 
 	"github.com/gdamore/tcell/v2"
@@ -17,7 +18,7 @@ type Enemy struct {
 	LastMoved    time.Time
 	Color        []int
 	LastTimeHit  time.Time
-	MustFlashing bool
+	TickFlashing time.Duration
 }
 
 func (enemy *Enemy) GoLeft() {
@@ -39,7 +40,12 @@ func (enemy *Enemy) GoRight() {
 func (enemy *Enemy) TakeDamage(amount int) {
 	enemy.HP -= amount
 	enemy.LastTimeHit = time.Now()
-	enemy.MustFlashing = true
+	log.Printf("Hit At %v: ", enemy.LastTimeHit)
+}
+
+func (enemy *Enemy) MustFlashing() bool {
+	log.Printf("Hit Since %v: ", enemy.LastTimeHit)
+	return time.Since(enemy.LastTimeHit) < enemy.TickFlashing
 }
 
 func (enemy *Enemy) Draw(screen tcell.Screen) {
@@ -49,25 +55,26 @@ func (enemy *Enemy) Draw(screen tcell.Screen) {
 		int32(enemy.Color[2]),
 	)
 
-	if enemy.MustFlashing {
+	if enemy.MustFlashing() {
 		color = tcell.ColorRed
 	}
 
 	screen.SetContent(enemy.W, enemy.H, enemy.Type, nil, tcell.StyleDefault.Foreground(color))
 }
 
-func GenerateEnemy(baseInterval time.Duration, height int) []*Enemy {
+func GenerateEnemy(baseInterval time.Duration, height int, flashTick time.Duration) []*Enemy {
 	now := time.Now()
 
 	return []*Enemy{
 		{
-			H:         height / 2,
-			W:         -2,
-			Type:      GRUNT,
-			HP:        3,
-			Interval:  baseInterval,
-			LastMoved: now,
-			Color:     []int{0, 0, 255}, // Blue
+			H:            height / 2,
+			W:            -2,
+			Type:         GRUNT,
+			HP:           3,
+			Interval:     baseInterval * 4,
+			LastMoved:    now,
+			Color:        []int{0, 0, 255}, // Blue
+			TickFlashing: flashTick,
 		},
 		// {
 		// 	H:         height / 2,
