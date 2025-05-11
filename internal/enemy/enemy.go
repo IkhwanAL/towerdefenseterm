@@ -88,23 +88,27 @@ func GenerateEnemy(baseInterval time.Duration, height int, flashTick time.Durati
 			TickFlashing: flashTick,
 			Alive:        true,
 		},
-		// {
-		// 	H:         height / 2,
-		// 	W:         -2,
-		// 	Type:      GRUNT,
-		// 	HP:        3,
-		// 	Interval:  baseInterval * 2,
-		// 	LastMoved: now.Add(baseInterval * 5),
-		// 	Color:     []int{0, 0, 255}, // Blue
-		// },
-		// {
-		// 	H:         height / 2,
-		// 	W:         -2,
-		// 	Type:      GRUNT,
-		// 	HP:        3,
-		// 	Interval:  baseInterval * 4,
-		// 	LastMoved: now.Add(baseInterval * 15),
-		// 	Color:     []int{0, 0, 255}, // Blue
-		// },
+		{
+			H:            height / 2,
+			W:            -2,
+			Type:         GRUNT,
+			HP:           3,
+			Interval:     baseInterval * 5,
+			LastMoved:    now.Add(baseInterval * 5),
+			Color:        []int{0, 0, 255}, // Blue
+			TickFlashing: flashTick,
+			Alive:        true,
+		},
+		{
+			H:            height / 2,
+			W:            -2,
+			Type:         GRUNT,
+			HP:           3,
+			Interval:     baseInterval * 6,
+			LastMoved:    now.Add(baseInterval * 15),
+			Color:        []int{0, 0, 255}, // Blue
+			TickFlashing: flashTick,
+			Alive:        true,
+		},
 	}
 }

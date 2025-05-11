@@ -14,8 +14,6 @@ import (
 const height = 25
 const width = 120
 
-const losRad = 5
-
 func interrupt(screen tcell.Screen, notify chan os.Signal) {
 	signal.Notify(notify, os.Interrupt)
 
@@ -129,6 +127,7 @@ func main() {
 			now := time.Now()
 
 			var enemyMoved []*enemy.Enemy
+			var restOfEnemy []*enemy.Enemy
 
 			for index := range enemies {
 				enemy := enemies[index]
@@ -143,9 +142,16 @@ func main() {
 					enemy.GoRight()
 					enemy.LastMoved = now
 					enemyMoved = append(enemyMoved, enemy)
+					enemy.Draw(screen)
+				} else {
+					restOfEnemy = append(restOfEnemy, enemy)
 				}
+			}
 
-				enemy.Draw(screen)
+			var stillAliveEnemies []*enemy.Enemy
+
+			if len(availableTower) == 0 {
+				stillAliveEnemies = enemyMoved
 			}
 
 			for _, watchTower := range availableTower {
@@ -162,11 +168,20 @@ func main() {
 					}
 
 					target.Draw(screen)
-
+					log.Printf("Target %v", target)
+					if target.HP > 0 {
+						stillAliveEnemies = append(stillAliveEnemies, target)
+					}
 				}
 			}
-
 			screen.Show()
+
+			restOfEnemy = append(restOfEnemy, stillAliveEnemies...)
+			enemies = restOfEnemy
+			// log.Printf("Not Moved %v", restOfEnemy)
+			// log.Printf("Just Moved %v", enemyMoved)
+			// log.Printf("Moved And Still Alive %v", stillAliveEnemies)
+
 		}
 	}
 }
