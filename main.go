@@ -92,7 +92,7 @@ func main() {
 
 	var availableTower []*tower.Tower
 
-	//TODO Make Enemy Disappear After Hp Drop 0
+	//TODO Randomly Generate Tower Placeholder
 	for {
 		select {
 		case ev := <-eventChan:
