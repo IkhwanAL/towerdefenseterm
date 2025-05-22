@@ -12,7 +12,7 @@ import (
 )
 
 const height = 25
-const width = 120
+const width = 180
 
 func interrupt(screen tcell.Screen, notify chan os.Signal) {
 	signal.Notify(notify, os.Interrupt)
