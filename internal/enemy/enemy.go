@@ -78,7 +78,7 @@ func GenerateEnemy(baseInterval time.Duration, height int, flashTick time.Durati
 
 	return []*Enemy{
 		{
-			H:            height / 2,
+			H:            height/2 - 1,
 			W:            -2,
 			Type:         GRUNT,
 			HP:           2,
@@ -89,7 +89,7 @@ func GenerateEnemy(baseInterval time.Duration, height int, flashTick time.Durati
 			Alive:        true,
 		},
 		{
-			H:            height / 2,
+			H:            height/2 - 1,
 			W:            -2,
 			Type:         GRUNT,
 			HP:           3,
@@ -100,7 +100,7 @@ func GenerateEnemy(baseInterval time.Duration, height int, flashTick time.Durati
 			Alive:        true,
 		},
 		{
-			H:            height / 2,
+			H:            height/2 - 1,
 			W:            -2,
 			Type:         GRUNT,
 			HP:           3,

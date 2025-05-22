@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/IkhwanAL/towerdefenseterm/internal/enemy"
+	"github.com/IkhwanAL/towerdefenseterm/internal/generator"
 	"github.com/IkhwanAL/towerdefenseterm/internal/tower"
 	"github.com/gdamore/tcell/v2"
 )
@@ -53,11 +54,9 @@ func main() {
 	// Generate Road
 	for h := range height {
 		for w := range width {
-			leftJunction := height / 2
 			road := (height / 2) - 1
-			rightJunction := (height / 2) + 1
 
-			if h == leftJunction || h == road || h == rightJunction {
+			if h == road {
 				screen.SetContent(w, h, ' ', nil, tcell.StyleDefault)
 			} else {
 				screen.SetContent(w, h, '#', nil, tcell.StyleDefault)
@@ -65,7 +64,9 @@ func main() {
 		}
 	}
 
-	tower.GenerateTowerPlaceholder(tower.TowerLocation, screen)
+	towerLocation := generator.TowerPlacement(width, height, 12, screen)
+
+	tower.GenerateTowerPlaceholder(towerLocation, screen)
 
 	tick := 100 * time.Millisecond
 
@@ -92,7 +93,7 @@ func main() {
 
 	var availableTower []*tower.Tower
 
-	//TODO Randomly Generate Tower Placeholder
+	//TODO Making Sure The Space Between Tower Is 3 Pixel or More
 	for {
 		select {
 		case ev := <-eventChan:
@@ -107,7 +108,7 @@ func main() {
 				if ev.Buttons() == tcell.Button1 {
 					x, y := ev.Position()
 
-					x, y = tower.AllowedToPlaceTower(x, y, tower.TowerLocation)
+					x, y = tower.AllowedToPlaceTower(x, y, towerLocation)
 
 					if x == -1 && y == -1 {
 						break
@@ -168,7 +169,6 @@ func main() {
 					}
 
 					target.Draw(screen)
-					log.Printf("Target %v", target)
 					if target.HP > 0 {
 						stillAliveEnemies = append(stillAliveEnemies, target)
 					}
