@@ -62,8 +62,6 @@ func main() {
 
 	towerLocation := generator.TowerPlacement(width, height, 12, screen)
 
-	// tower.GenerateTowerPlaceholder(towerLocation, screen)
-
 	tick := 100 * time.Millisecond
 
 	enemies := enemy.GenerateEnemy(tick, height, tick*4)
@@ -104,13 +102,21 @@ func main() {
 				if ev.Buttons() == tcell.Button1 {
 					x, y := ev.Position()
 
-					x, y = tower.AllowedToPlaceTower(x, y, towerLocation)
+					accepted, locationPoint := tower.AllowedToPlaceTower(x, y, towerLocation)
 
-					if x == -1 && y == -1 {
+					if !accepted {
+						log.Printf("%d, %d :: Failed Location Pick", x, y)
 						break
 					}
 
-					createdTower := tower.PlaceATower(screen, x, y, tick*7)
+					if !tower.CheckForScreenBeforePlaceTower(locationPoint[1], locationPoint[0], screen) {
+						log.Printf("%d, %d :: Failed Location Pick", x, y)
+						break
+					}
+
+					log.Printf("%v :: Accepted Location Point", locationPoint)
+
+					createdTower := tower.PlaceATower(screen, locationPoint[1], locationPoint[0], tick*7)
 
 					availableTower = append(availableTower, createdTower)
 

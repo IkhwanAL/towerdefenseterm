@@ -22,21 +22,6 @@ func (tower *Tower) UnitCloseToTower(px, py, qx, qy float64) bool {
 	return unitPosition <= tower.LOS
 }
 
-// [H, W]
-var TowerLocation = [][]int{
-	{(25 / 2) - 4, 100},
-	{(25 / 2) - 4, 90},
-	{(25 / 2) - 4, 80},
-	{(25 / 2) - 4, 50},
-	{(25 / 2) - 4, 30},
-
-	{(25 / 2) + 4, 30},
-	{(25 / 2) + 4, 50},
-	{(25 / 2) + 4, 80},
-	{(25 / 2) + 4, 90},
-	{(25 / 2) + 4, 100},
-}
-
 func GenerateTowerPlaceholder(
 	towerLocation [][]int,
 	screen tcell.Screen,
@@ -58,32 +43,45 @@ func GenerateTowerPlaceholder(
 	}
 }
 
-func AllowedToPlaceTower(x, y int, towerLocation [][]int) (int, int) {
+func AllowedToPlaceTower(x, y int, towerLocation [][]int) (bool, []int) {
 	locationAccepted := false
+
+	locationPoint := make([]int, 2)
 
 	for i := range towerLocation {
 		location := towerLocation[i]
 
-		if location[0]-1 == y || location[0]+1 == y {
-			return -1, -1
-		}
+		yAllowed := y == location[0]
+		xAllowed := x == location[1] || x == location[1]-1 || x == location[1]+1
 
-		if location[1]-1 == x || location[1]+1 == x {
-			return -1, -1
-		}
-
-		if location[0] == y && location[1] == x {
+		if xAllowed && yAllowed {
 			locationAccepted = true
+			locationPoint = location
 			break
 		}
 	}
 
-	if !locationAccepted {
-		return -1, -1
+	return locationAccepted, locationPoint
+}
+
+func CheckForScreenBeforePlaceTower(x, y int, screen tcell.Screen) bool {
+	leftContent, _, _, _ := screen.GetContent(x-1, y)
+	centerContent, _, _, _ := screen.GetContent(x, y)
+	rightContent, _, _, _ := screen.GetContent(x+1, y)
+
+	if leftContent != ' ' {
+		return false
 	}
 
-	return x, y
+	if centerContent != ' ' {
+		return false
+	}
 
+	if rightContent != ' ' {
+		return false
+	}
+
+	return true
 }
 
 func (tower *Tower) Attack() int {
@@ -98,18 +96,9 @@ func (tower *Tower) CanAttackNow() bool {
 }
 
 func PlaceATower(screen tcell.Screen, x, y int, attackSpeed time.Duration) *Tower {
-	screen.SetContent(x-1, y-1, '╭', nil, tcell.StyleDefault)
-	screen.SetContent(x, y-1, '-', nil, tcell.StyleDefault)
-	screen.SetContent(x+1, y-1, '╮', nil, tcell.StyleDefault)
-
-	screen.SetContent(x-1, y, '|', nil, tcell.StyleDefault)
-	screen.SetContent(x, y, '*', nil, tcell.StyleDefault)
-	screen.SetContent(x+1, y, '|', nil, tcell.StyleDefault)
-
-	screen.SetContent(x-1, y+1, '╰', nil, tcell.StyleDefault)
-	screen.SetContent(x, y+1, '-', nil, tcell.StyleDefault)
-	screen.SetContent(x+1, y+1, '╯', nil, tcell.StyleDefault)
-
+	screen.SetContent(x-1, y, '|', nil, tcell.StyleDefault.Foreground(tcell.ColorLightSkyBlue))
+	screen.SetContent(x, y, '*', nil, tcell.StyleDefault.Foreground(tcell.ColorLightSkyBlue))
+	screen.SetContent(x+1, y, '|', nil, tcell.StyleDefault.Foreground(tcell.ColorLightSkyBlue))
 	return &Tower{
 		W:           x,
 		H:           y,

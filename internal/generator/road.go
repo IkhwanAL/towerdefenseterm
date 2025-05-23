@@ -18,7 +18,7 @@ func Road(width, height int) [][]rune {
 	for w := range width {
 		grid[randomHeight][w] = road
 
-		shift := rand.Intn(5)
+		shift := rand.Intn(7)
 		if shift == 0 && randomHeight > 6 {
 			randomHeight--
 			grid[randomHeight][w] = road

@@ -3,33 +3,29 @@ package tower
 import "testing"
 
 func TestTowerLocationDetection(t *testing.T) {
-	var tableTest = []map[string][]int{
+	var tableTest = []map[string]interface{}{
 		{
-			"input":     {1, 2},
-			"placement": {2, 4},
-			"output":    {-1, -1},
+			"input":     []int{1, 2},
+			"placement": []int{2, 4},
+			"output":    false,
 		},
 		{
-			"input":     {1, 1},
-			"placement": {1, 1},
-			"output":    {1, 1},
+			"input":     []int{1, 1},
+			"placement": []int{1, 1},
+			"output":    true,
 		},
 	}
 
 	for _, test := range tableTest {
-		inputValue := test["input"]
-		allowedTowerLocation := [][]int{test["placement"]}
+		inputValue := test["input"].([]int)
+		allowedTowerLocation := [][]int{test["placement"].([]int)}
 
-		x, y := AllowedToPlaceTower(inputValue[0], inputValue[1], allowedTowerLocation)
+		allowed, _ := AllowedToPlaceTower(inputValue[0], inputValue[1], allowedTowerLocation)
 
-		outputValue := test["output"]
+		outputValue := test["output"].(bool)
 
-		if x != outputValue[0] {
-			t.Errorf("x value is %d, expected %d", x, outputValue[0])
-		}
-
-		if y != outputValue[1] {
-			t.Errorf("y value is %d, expected %d", y, outputValue[1])
+		if allowed != outputValue {
+			t.Errorf("value is %v, expected %v", allowed, outputValue)
 		}
 	}
 }

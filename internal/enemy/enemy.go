@@ -74,41 +74,41 @@ func (enemy *Enemy) Draw(screen tcell.Screen) {
 }
 
 func GenerateEnemy(baseInterval time.Duration, height int, flashTick time.Duration) []*Enemy {
-	now := time.Now()
+	// now := time.Now()
 
 	return []*Enemy{
-		{
-			H:            height/2 - 1,
-			W:            -2,
-			Type:         GRUNT,
-			HP:           2,
-			Interval:     baseInterval * 4,
-			LastMoved:    now,
-			Color:        []int{0, 0, 255}, // Blue
-			TickFlashing: flashTick,
-			Alive:        true,
-		},
-		{
-			H:            height/2 - 1,
-			W:            -2,
-			Type:         GRUNT,
-			HP:           3,
-			Interval:     baseInterval * 5,
-			LastMoved:    now.Add(baseInterval * 5),
-			Color:        []int{0, 0, 255}, // Blue
-			TickFlashing: flashTick,
-			Alive:        true,
-		},
-		{
-			H:            height/2 - 1,
-			W:            -2,
-			Type:         GRUNT,
-			HP:           3,
-			Interval:     baseInterval * 6,
-			LastMoved:    now.Add(baseInterval * 15),
-			Color:        []int{0, 0, 255}, // Blue
-			TickFlashing: flashTick,
-			Alive:        true,
-		},
+		// {
+		// 	H:            height/2 - 1,
+		// 	W:            -2,
+		// 	Type:         GRUNT,
+		// 	HP:           2,
+		// 	Interval:     baseInterval * 4,
+		// 	LastMoved:    now,
+		// 	Color:        []int{0, 0, 255}, // Blue
+		// 	TickFlashing: flashTick,
+		// 	Alive:        true,
+		// },
+		// {
+		// 	H:            height/2 - 1,
+		// 	W:            -2,
+		// 	Type:         GRUNT,
+		// 	HP:           3,
+		// 	Interval:     baseInterval * 5,
+		// 	LastMoved:    now.Add(baseInterval * 5),
+		// 	Color:        []int{0, 0, 255}, // Blue
+		// 	TickFlashing: flashTick,
+		// 	Alive:        true,
+		// },
+		// {
+		// 	H:            height/2 - 1,
+		// 	W:            -2,
+		// 	Type:         GRUNT,
+		// 	HP:           3,
+		// 	Interval:     baseInterval * 6,
+		// 	LastMoved:    now.Add(baseInterval * 15),
+		// 	Color:        []int{0, 0, 255}, // Blue
+		// 	TickFlashing: flashTick,
+		// 	Alive:        true,
+		// },
 	}
 }

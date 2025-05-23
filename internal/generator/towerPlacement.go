@@ -9,8 +9,7 @@ import (
 var road rune = ' '
 
 func TowerPlacement(width, height, maxTower int, stateMap tcell.Screen) [][]int {
-	var heightLocations []int
-	var widthLocations []int
+	var pixelLocation [][]int
 
 	for h := range height {
 		for w := range width {
@@ -20,11 +19,7 @@ func TowerPlacement(width, height, maxTower int, stateMap tcell.Screen) [][]int 
 				continue
 			}
 
-			// the minus and plus three are
-			// the padding between middle point and the road
-			heightLocations = append(heightLocations, h-3)
-			heightLocations = append(heightLocations, h+3)
-			widthLocations = append(widthLocations, w)
+			pixelLocation = append(pixelLocation, []int{h, w})
 		}
 	}
 
@@ -33,12 +28,41 @@ func TowerPlacement(width, height, maxTower int, stateMap tcell.Screen) [][]int 
 	var towerPlacement [][]int
 
 	for totalTower < maxTower {
-		w := getRandomizePoint(widthLocations)
-		h := getRandomizePoint(heightLocations)
+		dot := getRandomizePoint(pixelLocation)
 
-		stateMap.SetContent(w, h, '$', nil, tcell.StyleDefault)
+		padding := 3
 
-		towerPlacement = append(towerPlacement, []int{h, w})
+		negativeOrPositive := rand.Intn(2)
+
+		if negativeOrPositive == 0 {
+			padding = -padding
+		}
+
+		stateMap.SetContent(
+			dot[1],
+			dot[0]+padding,
+			' ',
+			nil,
+			tcell.StyleDefault.Background(tcell.ColorAntiqueWhite),
+		)
+
+		stateMap.SetContent(
+			dot[1]-1,
+			dot[0]+padding,
+			' ',
+			nil,
+			tcell.StyleDefault,
+		)
+
+		stateMap.SetContent(
+			dot[1]+1,
+			dot[0]+padding,
+			' ',
+			nil,
+			tcell.StyleDefault,
+		)
+
+		towerPlacement = append(towerPlacement, []int{dot[0] + padding, dot[1]})
 
 		totalTower += 1
 	}
@@ -46,6 +70,6 @@ func TowerPlacement(width, height, maxTower int, stateMap tcell.Screen) [][]int 
 	return towerPlacement
 }
 
-func getRandomizePoint(listLocation []int) int {
+func getRandomizePoint(listLocation [][]int) []int {
 	return listLocation[rand.Intn(len(listLocation))]
 }
