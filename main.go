@@ -60,8 +60,7 @@ func main() {
 		}
 	}
 
-	towerLocation := generator.TowerPlacement(width, height, 12, screen)
-
+	towerLocation := generator.TowerPlacement(width, height, 1, screen)
 	tick := 100 * time.Millisecond
 
 	enemies := enemy.GenerateEnemy(tick, height, tick*4)
@@ -87,7 +86,6 @@ func main() {
 
 	var availableTower []*tower.Tower
 
-	//TODO Random Generatar Road
 	for {
 		select {
 		case ev := <-eventChan:
@@ -119,8 +117,6 @@ func main() {
 					createdTower := tower.PlaceATower(screen, locationPoint[1], locationPoint[0], tick*7)
 
 					availableTower = append(availableTower, createdTower)
-
-					log.Print("I Place Tower")
 				}
 			}
 
@@ -134,8 +130,6 @@ func main() {
 
 			for index := range enemies {
 				enemy := enemies[index]
-
-				// log.Printf("HP %d", enemy.HP)
 
 				lastMoved := now.Sub(enemy.LastMoved)
 
@@ -180,10 +174,6 @@ func main() {
 
 			restOfEnemy = append(restOfEnemy, stillAliveEnemies...)
 			enemies = restOfEnemy
-			// log.Printf("Not Moved %v", restOfEnemy)
-			// log.Printf("Just Moved %v", enemyMoved)
-			// log.Printf("Moved And Still Alive %v", stillAliveEnemies)
-
 		}
 	}
 }
