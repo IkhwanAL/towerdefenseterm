@@ -51,22 +51,18 @@ func main() {
 
 	screen.Clear()
 
-	// Generate Road
-	for h := range height {
-		for w := range width {
-			road := (height / 2) - 1
+	grid := generator.Road(width, height)
 
-			if h == road {
-				screen.SetContent(w, h, ' ', nil, tcell.StyleDefault)
-			} else {
-				screen.SetContent(w, h, '#', nil, tcell.StyleDefault)
-			}
+	// Generate Road
+	for h, row := range grid {
+		for w, ch := range row {
+			screen.SetContent(w, h, ch, nil, tcell.StyleDefault)
 		}
 	}
 
 	towerLocation := generator.TowerPlacement(width, height, 12, screen)
 
-	tower.GenerateTowerPlaceholder(towerLocation, screen)
+	// tower.GenerateTowerPlaceholder(towerLocation, screen)
 
 	tick := 100 * time.Millisecond
 
@@ -93,7 +89,7 @@ func main() {
 
 	var availableTower []*tower.Tower
 
-	//TODO Making Sure The Space Between Tower Is 3 Pixel or More
+	//TODO Random Generatar Road
 	for {
 		select {
 		case ev := <-eventChan:
