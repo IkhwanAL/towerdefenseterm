@@ -17,24 +17,34 @@ func Road(width, height int) [][]rune {
 	}
 
 	y := rand.Intn(height)
-	// prevShift := 99
+	var prevCurves rune
 
 	for x := range width {
-		// grid[randomHeight][w] = road
-		// grid[randomHeight+1][w] = road
+		var curvesUsed rune
 
-		shift := rand.Intn(6)
+		shift := rand.Intn(7)
 		if shift == 0 && y > 6 {
 			y--
 			grid[y][x-1] = '/'
 			grid[y+1][x] = '/'
+			curvesUsed = '/'
 		} else if shift == 1 && y < height-6 {
 			y++
 			grid[y-1][x] = '\\'
 			grid[y][x-1] = '\\'
+			curvesUsed = '\\'
+		}
+
+		if prevCurves == '\\' && curvesUsed == '/' {
+			grid[y][x-1] = 'V'
+		}
+
+		if prevCurves == '/' && curvesUsed == '\\' {
+			grid[y][x-1] = 'Λ'
 		}
 
 		grid[y][x] = road
+		prevCurves = curvesUsed
 	}
 
 	return grid

@@ -86,6 +86,7 @@ func main() {
 
 	var availableTower []*tower.Tower
 
+	// TODO Some Curves Ar Overlap
 	for {
 		select {
 		case ev := <-eventChan:
