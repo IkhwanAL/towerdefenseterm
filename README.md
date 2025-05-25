@@ -17,3 +17,9 @@ Learn how does the game frame work, and try to create a game without game engine
 - Manage to create tower random generated tower placement each time running an app
 
 - Manage to use Fuzz Testing where it test random activity in specific function in this case i use fuzz testing in Procedural generated road to make sure to detect error early.
+
+## Future Plan
+
+- Create UI Interface
+- Create Variant Of Enemy Unit
+- Or Other -> i need time to think again
