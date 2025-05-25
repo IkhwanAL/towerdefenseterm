@@ -6,7 +6,7 @@ import (
 
 var land rune = '#'
 
-func Road(width, height int) [][]rune {
+func Road(width, height int) ([][]rune, [][]int) {
 	grid := make([][]rune, height)
 
 	for h := range grid {
@@ -18,6 +18,8 @@ func Road(width, height int) [][]rune {
 
 	y := rand.Intn(height)
 	var prevCurves rune
+
+	var pointLocationOfRoad [][]int
 
 	for x := range width {
 		var curvesUsed rune
@@ -44,8 +46,9 @@ func Road(width, height int) [][]rune {
 		}
 
 		grid[y][x] = road
+		pointLocationOfRoad = append(pointLocationOfRoad, []int{y, x})
 		prevCurves = curvesUsed
 	}
 
-	return grid
+	return grid, pointLocationOfRoad
 }

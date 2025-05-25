@@ -7,7 +7,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
-const GRUNT = '█'
+const GRUNT = '○'
 
 type Enemy struct {
 	H            int
@@ -19,23 +19,8 @@ type Enemy struct {
 	Color        []int
 	LastTimeHit  time.Time
 	TickFlashing time.Duration
+	RoadState    int
 	Alive        bool
-}
-
-func (enemy *Enemy) GoLeft() {
-	enemy.W -= 2
-}
-
-func (enemy *Enemy) GoTop() {
-	enemy.H += 2
-}
-
-func (enemy *Enemy) GoBottom() {
-	enemy.H -= 2
-}
-
-func (enemy *Enemy) GoRight() {
-	enemy.W += 2
 }
 
 func (enemy *Enemy) TakeDamage(amount int) {
@@ -73,42 +58,45 @@ func (enemy *Enemy) Draw(screen tcell.Screen) {
 	screen.SetContent(enemy.W, enemy.H, enemyType, nil, tcell.StyleDefault.Foreground(color))
 }
 
-func GenerateEnemy(baseInterval time.Duration, height int, flashTick time.Duration) []*Enemy {
-	// now := time.Now()
+func GenerateEnemy(baseInterval time.Duration, height int, flashTick time.Duration, hStart, wStart int) []*Enemy {
+	now := time.Now()
 
 	return []*Enemy{
-		// {
-		// 	H:            height/2 - 1,
-		// 	W:            -2,
-		// 	Type:         GRUNT,
-		// 	HP:           2,
-		// 	Interval:     baseInterval * 4,
-		// 	LastMoved:    now,
-		// 	Color:        []int{0, 0, 255}, // Blue
-		// 	TickFlashing: flashTick,
-		// 	Alive:        true,
-		// },
-		// {
-		// 	H:            height/2 - 1,
-		// 	W:            -2,
-		// 	Type:         GRUNT,
-		// 	HP:           3,
-		// 	Interval:     baseInterval * 5,
-		// 	LastMoved:    now.Add(baseInterval * 5),
-		// 	Color:        []int{0, 0, 255}, // Blue
-		// 	TickFlashing: flashTick,
-		// 	Alive:        true,
-		// },
-		// {
-		// 	H:            height/2 - 1,
-		// 	W:            -2,
-		// 	Type:         GRUNT,
-		// 	HP:           3,
-		// 	Interval:     baseInterval * 6,
-		// 	LastMoved:    now.Add(baseInterval * 15),
-		// 	Color:        []int{0, 0, 255}, // Blue
-		// 	TickFlashing: flashTick,
-		// 	Alive:        true,
-		// },
+		{
+			H:            hStart,
+			W:            wStart,
+			Type:         GRUNT,
+			HP:           2,
+			Interval:     baseInterval * 4,
+			LastMoved:    now,
+			Color:        []int{0, 0, 255}, // Blue
+			TickFlashing: flashTick,
+			RoadState:    0,
+			Alive:        true,
+		},
+		{
+			H:            hStart,
+			W:            wStart - 2,
+			Type:         GRUNT,
+			HP:           3,
+			Interval:     baseInterval * 5,
+			LastMoved:    now.Add(baseInterval * 5),
+			Color:        []int{0, 0, 255}, // Blue
+			TickFlashing: flashTick,
+			RoadState:    0,
+			Alive:        true,
+		},
+		{
+			H:            hStart,
+			W:            wStart - 2,
+			Type:         GRUNT,
+			HP:           3,
+			Interval:     baseInterval * 6,
+			LastMoved:    now.Add(baseInterval * 15),
+			Color:        []int{0, 0, 255}, // Blue
+			TickFlashing: flashTick,
+			RoadState:    0,
+			Alive:        true,
+		},
 	}
 }

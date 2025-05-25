@@ -51,7 +51,7 @@ func main() {
 
 	screen.Clear()
 
-	grid := generator.Road(width, height)
+	grid, road := generator.Road(width, height)
 
 	// Generate Road
 	for h, row := range grid {
@@ -63,7 +63,8 @@ func main() {
 	towerLocation := generator.TowerPlacement(width, height, 1, screen)
 	tick := 100 * time.Millisecond
 
-	enemies := enemy.GenerateEnemy(tick, height, tick*4)
+	log.Printf("%v Enemy Start", road[0])
+	enemies := enemy.GenerateEnemy(tick, height, tick*4, road[0][0], road[0][1])
 
 	for _, enemy := range enemies {
 		screen.SetContent(enemy.W, enemy.H, ' ', nil, tcell.StyleDefault)
@@ -86,7 +87,7 @@ func main() {
 
 	var availableTower []*tower.Tower
 
-	// TODO Some Curves Ar Overlap
+	// TODO Make Unit Run Based on Generated Road
 	for {
 		select {
 		case ev := <-eventChan:
@@ -137,7 +138,13 @@ func main() {
 				if lastMoved >= enemy.Interval {
 					screen.SetContent(enemy.W, enemy.H, ' ', nil, tcell.StyleDefault) // Removing Track
 
-					enemy.GoRight()
+					enemy.RoadState += 1
+
+					log.Printf("%d W %d H :: Enemy Movement", enemy.W, enemy.H)
+
+					enemy.H = road[enemy.RoadState][0]
+					enemy.W = road[enemy.RoadState][1]
+
 					enemy.LastMoved = now
 					enemyMoved = append(enemyMoved, enemy)
 					enemy.Draw(screen)
