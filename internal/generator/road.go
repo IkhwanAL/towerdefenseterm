@@ -1,12 +1,13 @@
 package generator
 
 import (
+	"log"
 	"math/rand"
 )
 
 var land rune = '#'
 
-func Road(width, height int) ([][]rune, [][]int) {
+func Road(rand *rand.Rand, width, height int) ([][]rune, [][]int) {
 	grid := make([][]rune, height)
 
 	for h := range grid {
@@ -17,20 +18,25 @@ func Road(width, height int) ([][]rune, [][]int) {
 	}
 
 	y := rand.Intn(height)
+	grid[y][0] = road
+
+	log.Printf("Start Height (y) :: %d", y)
 	var prevCurves rune
 
 	var pointLocationOfRoad [][]int
 
-	for x := range width {
+	for x := 1; x < width; x++ {
 		var curvesUsed rune
 
 		shift := rand.Intn(7)
+		log.Printf("Shift :: %d", shift)
 		if shift == 0 && y > 6 {
 			y--
 			grid[y][x-1] = '/'
 			grid[y+1][x] = '/'
 			curvesUsed = '/'
 		} else if shift == 1 && y < height-6 {
+			log.Printf("%d %d", y, x)
 			y++
 			grid[y-1][x] = '\\'
 			grid[y][x-1] = '\\'

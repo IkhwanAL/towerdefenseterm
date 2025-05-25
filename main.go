@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"math/rand"
 	"os"
 	"os/signal"
 	"time"
@@ -51,7 +52,13 @@ func main() {
 
 	screen.Clear()
 
-	grid, road := generator.Road(width, height)
+	seed := time.Now().UnixNano()
+
+	log.Printf("%d :: Seed Chosen", seed)
+
+	randSeed := rand.New(rand.NewSource(seed))
+
+	grid, road := generator.Road(randSeed, width, height)
 
 	// Generate Road
 	for h, row := range grid {
@@ -87,7 +94,9 @@ func main() {
 
 	var availableTower []*tower.Tower
 
-	// TODO Make Unit Run Based on Generated Road
+	// TODO Fix Bug Where Some Time It doesn Not Run
+	// the Only Possible Are there some out of index problem
+	// When generating road
 	for {
 		select {
 		case ev := <-eventChan:
