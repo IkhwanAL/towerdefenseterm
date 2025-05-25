@@ -28,16 +28,17 @@ func Road(rand *rand.Rand, width, height int) ([][]rune, [][]int) {
 	for x := 1; x < width; x++ {
 		var curvesUsed rune
 
+		// The Shifting Part is Where Road Change Direction (for now up or down)
+		// The bigger the max shifting number the seldom it to change direction
 		shift := rand.Intn(7)
 		log.Printf("Shift :: %d", shift)
 		if shift == 0 && y > 6 {
-			y--
+			y-- // go up
 			grid[y][x-1] = '/'
 			grid[y+1][x] = '/'
 			curvesUsed = '/'
 		} else if shift == 1 && y < height-6 {
-			log.Printf("%d %d", y, x)
-			y++
+			y++ // go down
 			grid[y-1][x] = '\\'
 			grid[y][x-1] = '\\'
 			curvesUsed = '\\'

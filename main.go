@@ -67,7 +67,7 @@ func main() {
 		}
 	}
 
-	towerLocation := generator.TowerPlacement(width, height, 1, screen)
+	towerLocation := generator.TowerPlacement(width, height, 7, screen)
 	tick := 100 * time.Millisecond
 
 	log.Printf("%v Enemy Start", road[0])
@@ -94,9 +94,6 @@ func main() {
 
 	var availableTower []*tower.Tower
 
-	// TODO Fix Bug Where Some Time It doesn Not Run
-	// the Only Possible Are there some out of index problem
-	// When generating road
 	for {
 		select {
 		case ev := <-eventChan:
