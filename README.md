@@ -8,10 +8,12 @@ this project is try to create a simple game in terminal
 
 Learn how does the game frame work, and try to create a game without game engine just using a simple library to render in terminal and probably learn something new along the way
 
-Update 11 May 2025
+## Learn
 
-- Timing The Ticker Is Quite Difficult. Rendering Ticker, Tower Attack Speed Ticker, Enemy Flashing When Get Hit Ticker To Get Those Three Sync and not messed up one after another. 
+- Timing The Ticker Is Quite Difficult. Rendering Ticker, Tower Attack Speed Ticker, Enemy Flashing When Get Hit Ticker To Get Those Three Sync and not messed up one after another.
 
-Update 12 May 2025
+- Manage to Create Procedural generated road where each time run an app it will create new road randomize
 
-- Try To Create New Algorithm With My New Set Of Rule
+- Manage to create tower random generated tower placement each time running an app
+
+- Manage to use Fuzz Testing where it test random activity in specific function in this case i use fuzz testing in Procedural generated road to make sure to detect error early.
